@@ -1,0 +1,84 @@
+from collections import defaultdict, deque
+
+class Graph:
+    def __init__(self):
+        self.adj_list = defaultdict(list)
+
+    def add_vertex(self, v):
+        """Add a vertex to the graph."""
+        if v not in self.adj_list:
+            self.adj_list[v] = []
+
+    def add_edge(self, u, v):
+        """Add a directed edge from node u to node v."""
+        if u not in self.adj_list:
+            self.add_vertex(u)
+        if v not in self.adj_list:
+            self.add_vertex(v)
+        self.adj_list[u].append(v)
+
+    def remove_vertex(self, v):
+        """Remove a vertex and its associated edges from the graph."""
+        if v in self.adj_list:
+            # Remove all edges to this vertex
+            for node in list(self.adj_list):
+                if v in self.adj_list[node]:
+                    self.adj_list[node].remove(v)
+            # Remove the vertex itself
+            del self.adj_list[v]
+
+    def remove_edge(self, u, v):
+        """Remove a directed edge from node u to node v."""
+        if u in self.adj_list and v in self.adj_list[u]:
+            self.adj_list[u].remove(v)
+
+    def bfs(self, start):
+        """Perform BFS traversal starting from the given node."""
+        visited = set()            # To keep track of visited nodes
+        queue = deque([start])     # Initialize a queue with the start node
+        bfs_order = []             # To store the order of BFS traversal
+
+        while queue:
+            node = queue.popleft()  # Dequeue a node from the front of the queue
+            if node not in visited:
+                visited.add(node)   # Mark the node as visited
+                bfs_order.append(node)  # Append it to the BFS order list
+
+                # Enqueue all adjacent nodes that haven't been visited
+                for neighbor in self.adj_list[node]:
+                    if neighbor not in visited:
+                        queue.append(neighbor)
+
+        return bfs_order
+
+    def display(self):
+        """Display the adjacency list of the graph."""
+        for node in self.adj_list:
+            print(f"{node} -> {', '.join(map(str, self.adj_list[node]))}")
+
+# Example usage
+graph = Graph()
+graph.add_vertex('A')
+graph.add_vertex('B')
+graph.add_vertex('C')
+graph.add_edge('A', 'B')
+graph.add_edge('A', 'C')
+graph.add_edge('B', 'C')
+graph.add_edge('C', 'D')
+
+print("Graph:")
+graph.display()
+
+print("\nBFS Traversal from 'A':")
+print(graph.bfs('A'))
+
+print("\nGraph after removing edge 'A' -> 'C':")
+graph.remove_edge('A', 'C')
+graph.display()
+
+
+# Time comlexity:
+""" Iterating over all nodes and their adjacency lists takes O(V + E) time. """
+
+# Space complexity:
+""" No additional space is required, so the space complexity is O(1). """
